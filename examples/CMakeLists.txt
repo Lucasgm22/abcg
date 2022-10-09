@@ -1,1 +1,5 @@
-add_subdirectory(helloworld)
+# add_subdirectory(helloworld)
+# add_subdirectory(firstapp)
+# add_subdirectory(tictactoe)
+# add_subdirectory(warships)
+add_subdirectory(reaction)
