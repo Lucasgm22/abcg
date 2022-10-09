@@ -119,7 +119,7 @@
       // "Stop game" button 
       if (m_gameState != GameState::Stop) {
         {
-          if (ImGui::Button("Stop", ImVec2(-1, 25))) {
+          if (ImGui::Button("Stop", ImVec2(-1, 50))) {
             m_gameState = GameState::Stop;
             m_hasPlayed = true;
           }
@@ -129,13 +129,13 @@
       ImGui::End();
     }
 
-  // Stats and config window
+  // Stats and config window only if game is stopped
   if (m_gameState == GameState::Stop) {
     ImGui::SetNextWindowSize(ImVec2(appWindowWidth, appWindowHeight / 2));
     ImGui::SetNextWindowPos(ImVec2(1, 0));
     ImGui::Begin("Stats and Config", nullptr);
 
-    //Statis
+    //Stats
     if (ImGui::CollapsingHeader("Stats from last play")) {
       {
         if (m_hasPlayed) {
@@ -158,7 +158,7 @@
     }
         
     // Play button
-    if (ImGui::Button("Play", ImVec2(-1, 25))) {
+    if (ImGui::Button("Play", ImVec2(-1, 50))) {
       m_gameState = GameState::FirstRound;
       m_reaction = 0;
       m_maxTime = 0;
