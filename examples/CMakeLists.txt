@@ -3,4 +3,5 @@
 # add_subdirectory(tictactoe)
 # add_subdirectory(warships)
 # add_subdirectory(reaction)
-add_subdirectory(sierpinski)
+# add_subdirectory(sierpinski)
+add_subdirectory(emilly)
