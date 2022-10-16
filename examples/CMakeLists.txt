@@ -4,4 +4,5 @@
 # add_subdirectory(warships)
 # add_subdirectory(reaction)
 # add_subdirectory(sierpinski)
-add_subdirectory(emilly)
+# add_subdirectory(emilly)
+add_subdirectory(coloredtriangles)
