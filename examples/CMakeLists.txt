@@ -6,4 +6,5 @@
 # add_subdirectory(sierpinski)
 # add_subdirectory(emilly)
 # add_subdirectory(coloredtriangles)
-add_subdirectory(regularpolygons)
+# add_subdirectory(regularpolygons)
+add_subdirectory(asteroids)
