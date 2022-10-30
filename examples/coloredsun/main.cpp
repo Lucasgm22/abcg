@@ -5,8 +5,14 @@ int main(int argc, char **argv) {
     abcg::Application app(argc, argv);
 
     Window window;
-    window.setWindowSettings(
-        {.width = 600, .height = 600, .title = "Warships"});
+    window.setOpenGLSettings({.samples = 4});
+    window.setWindowSettings({
+        .width = 600,
+        .height = 600,
+        .showFPS = false,
+        .showFullscreenButton = false,
+        .title = "Colored sun",
+    });
 
     app.run(window);
   } catch (std::exception const &exception) {
