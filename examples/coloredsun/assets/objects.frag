@@ -17,5 +17,5 @@ void main() {
   float mixValue = distance(st,u_mouse/u_resolution.xy);
   vec3 color = mix(u_color1,u_color2,mixValue);
 
-  outColor = vec4(color,mixValue);
+  outColor = vec4(color,1);
 }
