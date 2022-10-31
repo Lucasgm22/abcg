@@ -110,12 +110,12 @@ void main() {
   outColor = vec4(color,1);
 }
 ```
-**u_resolution:** Resolução atual da janela;
-**u_mouse:** Posição atual do mouse;
-**u_color1:** Cor do centro do degradê;
-**u_color2:** Cor externa do degradê;
-**outColor:** Cor de saída;
-**gl_FragCoord:** Coordenada do pixel;
+- **u_resolution:** Resolução atual da janela;
+- **u_mouse:** Posição atual do mouse;
+- **u_color1:** Cor do centro do degradê;
+- **u_color2:** Cor externa do degradê;
+- **outColor:** Cor de saída;
+- **gl_FragCoord:** Coordenada do pixel;
 
 Note como gl_FragCoord e u_mouse são dividos por u_resolution, isso é para normalizar as coordenadas no espaço [0,1]x[0,1]. 
 
