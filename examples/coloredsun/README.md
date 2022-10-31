@@ -119,4 +119,4 @@ void main() {
 
 Note como gl_FragCoord e u_mouse são dividos por u_resolution, isso é para normalizar as coordenadas no espaço [0,1]x[0,1]. 
 
-É a calculado um valor de mix sendo a distância entre `gl_FragCoor` e `u_mouse` que é usado para fazer uma interpolação linear na função `mix` entre `u_color1` e `u_color2` e esse resultado é a cor de sa
+É a calculado um valor de mix sendo a distância entre `gl_FragCoor` e `u_mouse` que é usado para fazer uma interpolação linear na função `mix` entre `u_color1` e `u_color2` e esse resultado é a cor de saída.
