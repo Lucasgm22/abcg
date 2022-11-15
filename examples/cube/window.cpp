@@ -1,0 +1,195 @@
+#include "window.hpp"
+
+void Window::onEvent(SDL_Event const &event) {
+
+  if (event.type == SDL_KEYDOWN && m_model.m_canMove) {
+    m_model.m_canMove = false;
+    if (event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP) 
+      m_input = Input::UP;
+    
+    if (event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN) 
+      m_input = Input::DOWN;
+    
+    if (event.key.keysym.sym == SDLK_a || event.key.keysym.sym == SDLK_LEFT) 
+      m_input = Input::LEFT;
+    
+    if (event.key.keysym.sym == SDLK_d || event.key.keysym.sym == SDLK_RIGHT) 
+      m_input = Input::RIGHT;
+    
+    m_timer.restart();
+    m_model.increaseAngle(1.0f); 
+  }
+}
+
+
+void Window::onCreate() {
+  auto const assetsPath{abcg::Application::getAssetsPath()};
+
+  abcg::glClearColor(0.5, 0.5, 0.5, 1);
+  abcg::glEnable(GL_DEPTH_TEST);
+
+  m_program =
+      abcg::createOpenGLProgram({{.source = assetsPath + "depth.vert",
+                                  .stage = abcg::ShaderStage::Vertex},
+                                 {.source = assetsPath + "depth.frag",
+                                  .stage = abcg::ShaderStage::Fragment}});
+
+  m_viewMatrixLoc = abcg::glGetUniformLocation(m_program, "viewMatrix");
+  m_projMatrixLoc = abcg::glGetUniformLocation(m_program, "projMatrix");
+  m_modelMatrixLoc = abcg::glGetUniformLocation(m_program, "modelMatrix");
+  m_colorLoc = abcg::glGetUniformLocation(m_program, "color");
+
+  m_ground.create(m_program, m_modelMatrixLoc, m_colorLoc);
+  m_model.loadObj(assetsPath + "box.obj");
+  m_model.setupVAO(m_program, m_modelMatrixLoc, m_colorLoc, m_scale);
+}
+
+void Window::onUpdate() {
+  m_viewMatrix =
+      glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
+                  glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+  if (m_model.m_angle > 0.0f && m_model.m_angle <= 90.0f) {
+    m_model.m_angle += 1.0f * m_timer.elapsed(); 
+    switch (m_input) {
+    case Input::DOWN:
+      m_model.moveDown();
+      break;
+    case Input::UP:
+      m_model.moveUp();
+      break;
+    case Input::LEFT:
+      m_model.moveLeft();
+      break;
+    case Input::RIGHT:
+      m_model.moveRigth();
+      break;
+    }
+
+  } else if (m_model.m_angle >= 90.0f) {
+      m_model.resetAnimation();
+      switch (m_input) {
+      case Input::DOWN:
+        m_model.translateDown();
+        break;
+      case Input::UP:
+        m_model.translateUp();
+        break;
+      case Input::LEFT:
+        m_model.translateLeft();
+        break;
+      case Input::RIGHT:
+        m_model.translateRight();
+        break;
+      }
+      m_model.m_canMove = true;
+  }
+
+}
+
+void Window::onPaint() {
+  abcg::glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  abcg::glViewport(0, 0, m_viewportSize.x, m_viewportSize.y);
+
+  abcg::glUseProgram(m_program);
+
+  // Set uniform variables that have the same value for every model
+  abcg::glUniformMatrix4fv(m_viewMatrixLoc, 1, GL_FALSE, &m_viewMatrix[0][0]);
+  abcg::glUniformMatrix4fv(m_projMatrixLoc, 1, GL_FALSE, &m_projMatrix[0][0]);
+
+  m_model.render();
+
+  m_ground.paint(m_scale);
+
+
+  abcg::glUseProgram(0);
+}
+
+void Window::onPaintUI() {
+  abcg::OpenGLWindow::onPaintUI();
+
+  // Create a window for the other widgets
+  {
+    auto const widgetSize{ImVec2(222, 90)};
+    ImGui::SetNextWindowPos(ImVec2(m_viewportSize.x - widgetSize.x - 5, 5));
+    ImGui::SetNextWindowSize(widgetSize);
+    ImGui::Begin("Widget window", nullptr, ImGuiWindowFlags_NoDecoration);
+
+    static bool faceCulling{};
+    ImGui::Checkbox("Back-face culling", &faceCulling);
+
+    if (faceCulling) {
+      abcg::glEnable(GL_CULL_FACE);
+    } else {
+      abcg::glDisable(GL_CULL_FACE);
+    }
+
+    // CW/CCW combo box
+    {
+      static std::size_t currentIndex{};
+      std::vector<std::string> const comboItems{"CCW", "CW"};
+
+      ImGui::PushItemWidth(120);
+      if (ImGui::BeginCombo("Front face",
+                            comboItems.at(currentIndex).c_str())) {
+        for (auto const index : iter::range(comboItems.size())) {
+          auto const isSelected{currentIndex == index};
+          if (ImGui::Selectable(comboItems.at(index).c_str(), isSelected))
+            currentIndex = index;
+          if (isSelected)
+            ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+      }
+      ImGui::PopItemWidth();
+
+      if (currentIndex == 0) {
+        abcg::glFrontFace(GL_CCW);
+      } else {
+        abcg::glFrontFace(GL_CW);
+      }
+    }
+
+    // Projection combo box
+    {
+      static std::size_t currentIndex{};
+      std::vector<std::string> comboItems{"Perspective", "Orthographic"};
+
+      ImGui::PushItemWidth(120);
+      if (ImGui::BeginCombo("Projection",
+                            comboItems.at(currentIndex).c_str())) {
+        for (auto const index : iter::range(comboItems.size())) {
+          auto const isSelected{currentIndex == index};
+          if (ImGui::Selectable(comboItems.at(index).c_str(), isSelected))
+            currentIndex = index;
+          if (isSelected)
+            ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndCombo();
+      }
+      ImGui::PopItemWidth();
+
+      if (currentIndex == 0) {
+        auto const aspect{gsl::narrow<float>(m_viewportSize.x) /
+                          gsl::narrow<float>(m_viewportSize.y)};
+        m_projMatrix =
+            glm::perspective(glm::radians(45.0f), aspect, 0.1f, 5.0f);
+      } else {
+        m_projMatrix = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 5.0f);
+      }
+    }
+
+    ImGui::End();
+  }
+}
+
+void Window::onResize(glm::ivec2 const &size) {
+  m_viewportSize = size;
+}
+
+void Window::onDestroy() {
+  m_ground.destroy();
+  m_model.destroy();
+  abcg::glDeleteProgram(m_program);
+}
