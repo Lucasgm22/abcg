@@ -1,5 +1,5 @@
-#ifndef MODEL_HPP_
-#define MODEL_HPP_
+#ifndef CUBE_HPP_
+#define CUBE_HPP_
 
 #include "abcgOpenGL.hpp"
 
@@ -9,36 +9,19 @@ struct Vertex {
   friend bool operator==(Vertex const &, Vertex const &) = default;
 };
 
-class Model {
+class Cube {
 public:
   void loadObj(std::string_view path);
   void render();
   void setupVAO(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float scale);
   void destroy() const;
-  bool m_canMove{true};
-  float m_angle{};
   void moveLeft();
-  void translateLeft();
   void moveRigth();
-  void translateRight();
   void moveUp();
-  void translateUp();
   void moveDown();
-  void translateDown();
-  void increaseAngle(float inc);
-  void resetAnimation();
-
-
-
-  [[nodiscard]] int getNumTriangles() const {
-    return gsl::narrow<int>(m_indices.size()) / 3;
-  }
+  bool isMoving();
 
 private:
-  glm::vec3 m_position{};
-  float m_scale{1.0f};
-
-
   GLuint m_VAO{};
   GLuint m_VBO{};
   GLuint m_EBO{};
@@ -54,7 +37,20 @@ private:
   std::vector<GLuint> m_indices;
 
   void createBuffers();
-  void move(int orientation);
+
+  enum class Orientation{ DOWN, RIGHT, UP, LEFT};
+
+  abcg::Timer m_timer;
+
+  glm::vec3 m_position{};
+  float m_scale{1.0f};
+  float m_angle{};
+  bool m_isMoving{false};
+
+  void move(Orientation orientation);
+  void translate(Orientation orientation);
+  void resetAnimation();
+  void increaseAngle(float inc);
 
 };
 

@@ -1,4 +1,4 @@
-#include "model.hpp"
+#include "cube.hpp"
 
 #include <unordered_map>
 #include <glm/gtx/fast_trigonometry.hpp>
@@ -11,7 +11,7 @@ template <> struct std::hash<Vertex> {
   }
 };
 
-void Model::createBuffers() {
+void Cube::createBuffers() {
   // Delete previous buffers
   abcg::glDeleteBuffers(1, &m_EBO);
   abcg::glDeleteBuffers(1, &m_VBO);
@@ -33,7 +33,7 @@ void Model::createBuffers() {
   abcg::glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void Model::loadObj(std::string_view path) {
+void Cube::loadObj(std::string_view path) {
   tinyobj::ObjReader reader;
 
   if (!reader.ParseFromFile(path.data())) {
@@ -87,13 +87,13 @@ void Model::loadObj(std::string_view path) {
   createBuffers();
 }
 
-void Model::render() {
+void Cube::render() {
   // Set uniform variables for the cube
   m_positionMatrix = glm::translate(glm::mat4{1.0f}, m_position);
   m_modelMatrix = m_positionMatrix * m_animationMatrix;
   m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(m_scale, m_scale, m_scale));
   abcg::glUniformMatrix4fv(m_modelMatrixLoc, 1, GL_FALSE, &m_modelMatrix[0][0]);
-  abcg::glUniform4f(m_colorLoc, 1.0f, 0.0f, 0.0f, 1.0f); // White
+  abcg::glUniform4f(m_colorLoc, 1.0f, 0.0f, 0.0f, 1.0f); // RED
 
   //SET uniform variables here
   abcg::glBindVertexArray(m_VAO);
@@ -103,7 +103,7 @@ void Model::render() {
   abcg::glBindVertexArray(0);
 }
 
-void Model::setupVAO(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float scale) {
+void Cube::setupVAO(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float scale) {
   // Release previous VAO
   abcg::glDeleteVertexArrays(1, &m_VAO);
 
@@ -134,62 +134,85 @@ void Model::setupVAO(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float
 }
 
 
-void Model::destroy() const {
+void Cube::destroy() const {
   abcg::glDeleteBuffers(1, &m_EBO);
   abcg::glDeleteBuffers(1, &m_VBO);
   abcg::glDeleteVertexArrays(1, &m_VAO);
 }
 
 
-//orientation - 0 rotates down, 1 rotates right, 2 rotates up, 3 rotates left
-void Model::move(int orientation) {
-  m_animationMatrix = glm::rotate(glm::mat4{1.0f}, glm::radians(orientation * 90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //ROTATE AROUND A DIRECTION
-  m_animationMatrix = glm::translate(m_animationMatrix, glm::vec3(0, -m_scale/2, m_scale/2)); //PUT ON ORIGIN
-  m_animationMatrix = glm::rotate(m_animationMatrix, glm::radians(m_angle), glm::vec3(1.0f, 0.0f, 0.0f)); //ROTATE AROUND X axis
-  m_animationMatrix = glm::translate(m_animationMatrix, glm::vec3(0, m_scale/2, -m_scale/2));//TRANSLATTE TO MATCH X axis
+void Cube::move(Orientation orientation) {
+  if (m_angle >= 0.0f && m_angle <= 90.0f) {
+    m_animationMatrix = glm::rotate(glm::mat4{1.0f}, glm::radians(static_cast<int>(orientation) * 90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //ROTATE AROUND A DIRECTION
+    m_animationMatrix = glm::translate(m_animationMatrix, glm::vec3(0, -m_scale/2, m_scale/2)); //PUT ON ORIGIN
+    m_animationMatrix = glm::rotate(m_animationMatrix, glm::radians(m_angle), glm::vec3(1.0f, 0.0f, 0.0f)); //ROTATE AROUND X axis
+    m_animationMatrix = glm::translate(m_animationMatrix, glm::vec3(0, m_scale/2, -m_scale/2));//TRANSLATTE TO MATCH X axis
+  } else if (m_angle >= 90.0f) {
+    resetAnimation();
+    translate(orientation);
+    m_isMoving = false;
+  }
 }
 
-void Model::moveDown() {
-  move(0);
+void Cube::resetAnimation() {
+  m_animationMatrix = glm::mat4{1.0f};
+  m_angle = 0.0f;
+  m_isMoving = false;
 }
 
-void Model::moveUp() {
-  move(2);
+void Cube::translate(Orientation orientation) {
+  switch (orientation) {
+    case Orientation::DOWN:
+      m_position.z += m_scale;
+      break;
+    case Orientation::UP:
+      m_position.z -= m_scale;
+      break;
+    case Orientation::LEFT:
+      m_position.x -= m_scale;
+      break;
+    case Orientation::RIGHT:
+      m_position.x += m_scale;
+      break;
+  }
 }
 
-void Model::moveLeft() {
-  move(3);
+void Cube::moveDown() {
+  if (m_position.z + m_scale > 1.0f) return;
+  if(!m_isMoving) m_timer.restart();
+  m_isMoving = true;
+  increaseAngle(m_timer.elapsed());
+  move(Orientation::DOWN);
 }
 
-void Model::moveRigth() {
-  move(1);
+void Cube::moveUp() {
+  if (m_position.z - m_scale < -1.0f) return;
+  if(!m_isMoving) m_timer.restart();
+  m_isMoving = true;
+  increaseAngle(m_timer.elapsed());
+  move(Orientation::UP);
 }
 
-void Model::translateDown() {
-  m_position.z += m_scale;
+void Cube::moveLeft() {
+  if (m_position.x - m_scale < -1.0f) return;
+  if(!m_isMoving) m_timer.restart();
+  m_isMoving = true;
+  increaseAngle(m_timer.elapsed());
+  move(Orientation::LEFT);
 }
 
-
-void Model::translateUp() {
-  m_position.z -= m_scale;
+void Cube::moveRigth() {
+  if (m_position.x + m_scale > 1.0f) return; 
+  if(!m_isMoving) m_timer.restart();
+  m_isMoving = true;
+  increaseAngle(m_timer.elapsed());
+  move(Orientation::RIGHT);
 }
 
-
-void Model::translateLeft() {
-  m_position.x -= m_scale;
-}
-
-
-void Model::translateRight() {
-  m_position.x += m_scale;
-}
-
-void Model::increaseAngle(float inc) {
+void Cube::increaseAngle(float inc) {
   m_angle += inc;
 }
 
-void Model::resetAnimation() {
-  m_animationMatrix = glm::mat4{1.0f};
-  m_angle = 0.0f;
-  m_canMove = true;
+bool Cube::isMoving() {
+  return m_isMoving;
 }

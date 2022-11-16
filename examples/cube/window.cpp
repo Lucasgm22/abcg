@@ -2,22 +2,24 @@
 
 void Window::onEvent(SDL_Event const &event) {
 
-  if (event.type == SDL_KEYDOWN && m_model.m_canMove) {
-    m_model.m_canMove = false;
-    if (event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP) 
+  if (event.type == SDL_KEYDOWN && !m_cube.isMoving()) {
+ 
+    if (event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP) {
       m_input = Input::UP;
-    
-    if (event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN) 
+      m_cube.moveUp();
+    }
+    if (event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN) {
       m_input = Input::DOWN;
-    
-    if (event.key.keysym.sym == SDLK_a || event.key.keysym.sym == SDLK_LEFT) 
+      m_cube.moveDown();
+    }
+    if (event.key.keysym.sym == SDLK_a || event.key.keysym.sym == SDLK_LEFT) {
       m_input = Input::LEFT;
-    
-    if (event.key.keysym.sym == SDLK_d || event.key.keysym.sym == SDLK_RIGHT) 
+      m_cube.moveLeft();
+    }
+    if (event.key.keysym.sym == SDLK_d || event.key.keysym.sym == SDLK_RIGHT) {
       m_input = Input::RIGHT;
-    
-    m_timer.restart();
-    m_model.increaseAngle(1.0f); 
+      m_cube.moveRigth();
+    }
   }
 }
 
@@ -25,7 +27,7 @@ void Window::onEvent(SDL_Event const &event) {
 void Window::onCreate() {
   auto const assetsPath{abcg::Application::getAssetsPath()};
 
-  abcg::glClearColor(0.5, 0.5, 0.5, 1);
+  abcg::glClearColor(0, 0, 0, 1);
   abcg::glEnable(GL_DEPTH_TEST);
 
   m_program =
@@ -40,51 +42,31 @@ void Window::onCreate() {
   m_colorLoc = abcg::glGetUniformLocation(m_program, "color");
 
   m_ground.create(m_program, m_modelMatrixLoc, m_colorLoc);
-  m_model.loadObj(assetsPath + "box.obj");
-  m_model.setupVAO(m_program, m_modelMatrixLoc, m_colorLoc, m_scale);
+  m_cube.loadObj(assetsPath + "box.obj");
+  m_cube.setupVAO(m_program, m_modelMatrixLoc, m_colorLoc, m_scale);
+
+  m_viewMatrix =glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
+                            glm::vec3(0.0f, 0.0f, 0.0f), 
+                            glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void Window::onUpdate() {
-  m_viewMatrix =
-      glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
-                  glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-  if (m_model.m_angle > 0.0f && m_model.m_angle <= 90.0f) {
-    m_model.m_angle += 1.0f * m_timer.elapsed(); 
+  if (m_cube.isMoving()) {
     switch (m_input) {
     case Input::DOWN:
-      m_model.moveDown();
+      m_cube.moveDown();
       break;
     case Input::UP:
-      m_model.moveUp();
+      m_cube.moveUp();
       break;
     case Input::LEFT:
-      m_model.moveLeft();
+      m_cube.moveLeft();
       break;
     case Input::RIGHT:
-      m_model.moveRigth();
+      m_cube.moveRigth();
       break;
     }
-
-  } else if (m_model.m_angle >= 90.0f) {
-      m_model.resetAnimation();
-      switch (m_input) {
-      case Input::DOWN:
-        m_model.translateDown();
-        break;
-      case Input::UP:
-        m_model.translateUp();
-        break;
-      case Input::LEFT:
-        m_model.translateLeft();
-        break;
-      case Input::RIGHT:
-        m_model.translateRight();
-        break;
-      }
-      m_model.m_canMove = true;
   }
-
 }
 
 void Window::onPaint() {
@@ -98,7 +80,7 @@ void Window::onPaint() {
   abcg::glUniformMatrix4fv(m_viewMatrixLoc, 1, GL_FALSE, &m_viewMatrix[0][0]);
   abcg::glUniformMatrix4fv(m_projMatrixLoc, 1, GL_FALSE, &m_projMatrix[0][0]);
 
-  m_model.render();
+  m_cube.render();
 
   m_ground.paint(m_scale);
 
@@ -190,6 +172,6 @@ void Window::onResize(glm::ivec2 const &size) {
 
 void Window::onDestroy() {
   m_ground.destroy();
-  m_model.destroy();
+  m_cube.destroy();
   abcg::glDeleteProgram(m_program);
 }

@@ -2,7 +2,7 @@
 #define WINDOW_HPP_
 
 #include "abcgOpenGL.hpp"
-#include "model.hpp"
+#include "cube.hpp"
 #include "ground.hpp"
 
 
@@ -26,7 +26,6 @@ private:
 
   glm::ivec2 m_viewportSize{};
   float m_scale{0.2f};
-  Model m_model;
 
 
   GLint m_modelMatrixLoc{};
@@ -37,6 +36,7 @@ private:
   GLint m_colorLoc{};
 
   Ground m_ground;
+  Cube m_cube;
   GLuint m_program{};
 };
 
