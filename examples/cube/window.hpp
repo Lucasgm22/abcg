@@ -21,7 +21,6 @@ private:
   glm::ivec2 m_viewportSize{};
   float m_scale{0.2f};
 
-
   GLint m_modelMatrixLoc{};
   glm::mat4 m_viewMatrix{1.0f};
   GLint m_viewMatrixLoc{};
