@@ -12,7 +12,8 @@ struct Vertex {
 class Cube {
 public:
   void loadObj(std::string_view path);
-  void render();
+  void paint();
+  void update();
   void setupVAO(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float scale);
   void destroy() const;
   void moveLeft();
@@ -45,10 +46,11 @@ private:
   glm::vec3 m_position{};
   float m_scale{1.0f};
   float m_angle{};
+  Orientation m_orientation{Orientation::DOWN};
   bool m_isMoving{false};
 
-  void move(Orientation orientation);
-  void translate(Orientation orientation);
+  void move();
+  void translate();
   void resetAnimation();
   void increaseAngle(float inc);
 

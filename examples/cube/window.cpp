@@ -5,19 +5,15 @@ void Window::onEvent(SDL_Event const &event) {
   if (event.type == SDL_KEYDOWN && !m_cube.isMoving()) {
  
     if (event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP) {
-      m_input = Input::UP;
       m_cube.moveUp();
     }
     if (event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN) {
-      m_input = Input::DOWN;
       m_cube.moveDown();
     }
     if (event.key.keysym.sym == SDLK_a || event.key.keysym.sym == SDLK_LEFT) {
-      m_input = Input::LEFT;
       m_cube.moveLeft();
     }
     if (event.key.keysym.sym == SDLK_d || event.key.keysym.sym == SDLK_RIGHT) {
-      m_input = Input::RIGHT;
       m_cube.moveRigth();
     }
   }
@@ -51,22 +47,7 @@ void Window::onCreate() {
 }
 
 void Window::onUpdate() {
-  if (m_cube.isMoving()) {
-    switch (m_input) {
-    case Input::DOWN:
-      m_cube.moveDown();
-      break;
-    case Input::UP:
-      m_cube.moveUp();
-      break;
-    case Input::LEFT:
-      m_cube.moveLeft();
-      break;
-    case Input::RIGHT:
-      m_cube.moveRigth();
-      break;
-    }
-  }
+  m_cube.update();
 }
 
 void Window::onPaint() {
@@ -80,8 +61,7 @@ void Window::onPaint() {
   abcg::glUniformMatrix4fv(m_viewMatrixLoc, 1, GL_FALSE, &m_viewMatrix[0][0]);
   abcg::glUniformMatrix4fv(m_projMatrixLoc, 1, GL_FALSE, &m_projMatrix[0][0]);
 
-  m_cube.render();
-
+  m_cube.paint();
   m_ground.paint(m_scale);
 
 

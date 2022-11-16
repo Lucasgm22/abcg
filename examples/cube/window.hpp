@@ -18,12 +18,6 @@ protected:
 
 private:
 
-  enum class Input{ DOWN, RIGHT, UP, LEFT};
-  Input m_input{Input::DOWN};
-  
-  abcg::Timer m_timer;
-
-
   glm::ivec2 m_viewportSize{};
   float m_scale{0.2f};
 
