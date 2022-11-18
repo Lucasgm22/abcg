@@ -49,6 +49,7 @@ private:
   Orientation m_orientation{Orientation::DOWN};
   bool m_isMoving{false};
   float m_maxPos{1.0f};
+  float m_angleVelocity{20.0f};
 
   void move();
   void translate();

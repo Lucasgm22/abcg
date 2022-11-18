@@ -162,6 +162,7 @@ void Cube::destroy() const {
 
 void Cube::move() {
   if (m_angle >= 0.0f && m_angle <= 90.0f) {
+    increaseAngle(m_timer.elapsed() * m_angleVelocity);
     m_animationMatrix = glm::rotate(glm::mat4{1.0f}, glm::radians(static_cast<int>(m_orientation) * 90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //ROTATE AROUND A DIRECTION
     m_animationMatrix = glm::translate(m_animationMatrix, glm::vec3(0, -m_scale/2, m_scale/2)); //PUT ON ORIGIN
     m_animationMatrix = glm::rotate(m_animationMatrix, glm::radians(m_angle), glm::vec3(1.0f, 0.0f, 0.0f)); //ROTATE AROUND X axis
@@ -200,7 +201,6 @@ void Cube::moveDown() {
   if (m_position.z + m_scale > m_maxPos) return;
   if(!m_isMoving) m_timer.restart();
   m_isMoving = true;
-  increaseAngle(m_timer.elapsed());
   m_orientation = Orientation::DOWN;
   move();
 }
@@ -209,7 +209,6 @@ void Cube::moveUp() {
   if (m_position.z - m_scale < -m_maxPos) return;
   if(!m_isMoving) m_timer.restart();
   m_isMoving = true;
-  increaseAngle(m_timer.elapsed());
   m_orientation = Orientation::UP;
   move();
 }
@@ -218,7 +217,6 @@ void Cube::moveLeft() {
   if (m_position.x - m_scale < -m_maxPos) return;
   if(!m_isMoving) m_timer.restart();
   m_isMoving = true;
-  increaseAngle(m_timer.elapsed());
   m_orientation = Orientation::LEFT;
   move();
 }
@@ -227,7 +225,6 @@ void Cube::moveRigth() {
   if (m_position.x + m_scale > m_maxPos) return; 
   if(!m_isMoving) m_timer.restart();
   m_isMoving = true;
-  increaseAngle(m_timer.elapsed());
   m_orientation = Orientation::RIGHT;
   move();
 }
