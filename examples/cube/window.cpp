@@ -37,7 +37,7 @@ void Window::onCreate() {
   m_modelMatrixLoc = abcg::glGetUniformLocation(m_program, "modelMatrix");
   m_colorLoc = abcg::glGetUniformLocation(m_program, "color");
 
-  m_ground.create(m_program, m_modelMatrixLoc, m_colorLoc);
+  m_ground.create(m_program, m_modelMatrixLoc, m_colorLoc, m_scale);
   m_cube.loadObj(assetsPath + "box.obj");
   m_cube.setupVAO(m_program, m_modelMatrixLoc, m_colorLoc, m_scale);
 
@@ -62,7 +62,7 @@ void Window::onPaint() {
   abcg::glUniformMatrix4fv(m_projMatrixLoc, 1, GL_FALSE, &m_projMatrix[0][0]);
 
   m_cube.paint();
-  m_ground.paint(m_scale);
+  m_ground.paint();
 
 
   abcg::glUseProgram(0);

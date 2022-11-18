@@ -1,6 +1,6 @@
 #include "ground.hpp"
 
-void Ground::create(GLuint program, GLint modelMatrixLoc, GLint colorLoc) {
+void Ground::create(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float scale) {
   // Unit quad on the xz plane
   std::array<glm::vec3, 4> vertices{{{+0.5f, 0.0f, -0.5f},
                                      {-0.5f, 0.0f, -0.5f},
@@ -29,9 +29,10 @@ void Ground::create(GLuint program, GLint modelMatrixLoc, GLint colorLoc) {
   //Load location of uniform variables of shader
   m_modelMatrixLoc = modelMatrixLoc;
   m_colorLoc = colorLoc;
+  m_scale = scale;
 }
 
-void Ground::paint(float scale) {
+void Ground::paint() {
   abcg::glBindVertexArray(m_VAO);
 
   // Draw a grid of 2N+1 x 2N+1 tiles on the xz plane, centered around the
@@ -42,8 +43,8 @@ void Ground::paint(float scale) {
       // Set model matrix as a translation matrix
       glm::mat4 model{1.0f};
 
-      model = glm::translate(model, glm::vec3(x * scale, -0.1f, z * scale));
-      model = glm::scale(model, glm::vec3(scale, scale, scale));
+      model = glm::translate(model, glm::vec3(x * m_scale, -0.1f, z * m_scale));
+      model = glm::scale(model, glm::vec3(m_scale, m_scale, m_scale));
 
       abcg::glUniformMatrix4fv(m_modelMatrixLoc, 1, GL_FALSE, &model[0][0]);
 

@@ -5,8 +5,8 @@
 
 class Ground {
 public:
-  void create(GLuint program, GLint modelMatrixLoc, GLint colorLoc);
-  void paint(float scale);
+  void create(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float scale);
+  void paint();
   void destroy();
 
 private:

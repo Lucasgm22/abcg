@@ -197,7 +197,7 @@ void Cube::translate() {
 }
 
 void Cube::moveDown() {
-  if (m_position.z + m_scale > 1.0f) return;
+  if (m_position.z + m_scale > m_maxPos) return;
   if(!m_isMoving) m_timer.restart();
   m_isMoving = true;
   increaseAngle(m_timer.elapsed());
@@ -206,7 +206,7 @@ void Cube::moveDown() {
 }
 
 void Cube::moveUp() {
-  if (m_position.z - m_scale < -1.0f) return;
+  if (m_position.z - m_scale < -m_maxPos) return;
   if(!m_isMoving) m_timer.restart();
   m_isMoving = true;
   increaseAngle(m_timer.elapsed());
@@ -215,7 +215,7 @@ void Cube::moveUp() {
 }
 
 void Cube::moveLeft() {
-  if (m_position.x - m_scale < -1.0f) return;
+  if (m_position.x - m_scale < -m_maxPos) return;
   if(!m_isMoving) m_timer.restart();
   m_isMoving = true;
   increaseAngle(m_timer.elapsed());
@@ -224,7 +224,7 @@ void Cube::moveLeft() {
 }
 
 void Cube::moveRigth() {
-  if (m_position.x + m_scale > 1.0f) return; 
+  if (m_position.x + m_scale > m_maxPos) return; 
   if(!m_isMoving) m_timer.restart();
   m_isMoving = true;
   increaseAngle(m_timer.elapsed());
