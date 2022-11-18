@@ -5,20 +5,19 @@ void Window::onEvent(SDL_Event const &event) {
   if (event.type == SDL_KEYDOWN && !m_cube.isMoving()) {
  
     if (event.key.keysym.sym == SDLK_w || event.key.keysym.sym == SDLK_UP) {
-      m_cube.moveUp();
+      m_cube.moveUp(getDeltaTimef());
     }
     if (event.key.keysym.sym == SDLK_s || event.key.keysym.sym == SDLK_DOWN) {
-      m_cube.moveDown();
+      m_cube.moveDown(getDeltaTimef());
     }
     if (event.key.keysym.sym == SDLK_a || event.key.keysym.sym == SDLK_LEFT) {
-      m_cube.moveLeft();
+      m_cube.moveLeft(getDeltaTimef());
     }
     if (event.key.keysym.sym == SDLK_d || event.key.keysym.sym == SDLK_RIGHT) {
-      m_cube.moveRigth();
+      m_cube.moveRigth(getDeltaTimef());
     }
   }
 }
-
 
 void Window::onCreate() {
   auto const assetsPath{abcg::Application::getAssetsPath()};
@@ -47,7 +46,7 @@ void Window::onCreate() {
 }
 
 void Window::onUpdate() {
-  m_cube.update();
+  m_cube.update(getDeltaTimef());
 }
 
 void Window::onPaint() {
@@ -116,4 +115,8 @@ void Window::onDestroy() {
   m_ground.destroy();
   m_cube.destroy();
   abcg::glDeleteProgram(m_program);
+}
+
+float Window::getDeltaTimef() {
+  return gsl::narrow_cast<float>(getDeltaTime());
 }

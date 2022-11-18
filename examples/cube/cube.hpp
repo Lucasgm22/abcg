@@ -13,13 +13,13 @@ class Cube {
 public:
   void loadObj(std::string_view path);
   void paint();
-  void update();
+  void update(float deltaTime);
   void setupVAO(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float scale);
   void destroy() const;
-  void moveLeft();
-  void moveRigth();
-  void moveUp();
-  void moveDown();
+  void moveLeft(float deltaTime);
+  void moveRigth(float deltaTime);
+  void moveUp(float deltaTime);
+  void moveDown(float deltaTime);
   bool isMoving();
 
 private:
@@ -41,17 +41,15 @@ private:
 
   enum class Orientation{ DOWN, RIGHT, UP, LEFT};
 
-  abcg::Timer m_timer;
-
   glm::vec3 m_position{};
   float m_scale{1.0f};
   float m_angle{};
   Orientation m_orientation{Orientation::DOWN};
   bool m_isMoving{false};
   float m_maxPos{1.0f};
-  float m_angleVelocity{20.0f};
+  float m_angleVelocity{360.0f};
 
-  void move();
+  void move(float deltaTime);
   void translate();
   void resetAnimation();
   void increaseAngle(float inc);

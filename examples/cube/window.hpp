@@ -15,6 +15,7 @@ protected:
   void onPaintUI() override;
   void onResize(glm::ivec2 const &size) override;
   void onDestroy() override;
+  float getDeltaTimef();
 
 private:
 
