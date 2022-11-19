@@ -1,6 +1,6 @@
 #include "ground.hpp"
 
-void Ground::create(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float scale) {
+void Ground::create(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float scale, int N) {
   // Unit quad on the xz plane
   std::array<glm::vec3, 4> vertices{{{+0.5f, 0.0f, -0.5f},
                                      {-0.5f, 0.0f, -0.5f},
@@ -30,6 +30,7 @@ void Ground::create(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float 
   m_modelMatrixLoc = modelMatrixLoc;
   m_colorLoc = colorLoc;
   m_scale = scale;
+  m_N = N;
 }
 
 void Ground::paint() {
@@ -37,9 +38,8 @@ void Ground::paint() {
 
   // Draw a grid of 2N+1 x 2N+1 tiles on the xz plane, centered around the
   // origin
-  auto const N{5};
-  for (auto const z : iter::range(-N, N + 1)) {
-    for (auto const x : iter::range(-N, N + 1)) {
+  for (auto const z : iter::range(-m_N, m_N + 1)) {
+    for (auto const x : iter::range(-m_N, m_N + 1)) {
       // Set model matrix as a translation matrix
       glm::mat4 model{1.0f};
 

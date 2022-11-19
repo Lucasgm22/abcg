@@ -36,9 +36,9 @@ void Window::onCreate() {
   m_modelMatrixLoc = abcg::glGetUniformLocation(m_program, "modelMatrix");
   m_colorLoc = abcg::glGetUniformLocation(m_program, "color");
 
-  m_ground.create(m_program, m_modelMatrixLoc, m_colorLoc, m_scale);
+  m_ground.create(m_program, m_modelMatrixLoc, m_colorLoc, m_scale, m_N);
   m_cube.loadObj(assetsPath + "box.obj");
-  m_cube.setupVAO(m_program, m_modelMatrixLoc, m_colorLoc, m_scale);
+  m_cube.setupVAO(m_program, m_modelMatrixLoc, m_colorLoc, m_scale, m_N);
 
   m_viewMatrix =glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
                             glm::vec3(0.0f, 0.0f, 0.0f), 

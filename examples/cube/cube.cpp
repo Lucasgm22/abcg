@@ -103,7 +103,7 @@ void Cube::paint() {
   abcg::glBindVertexArray(0);
 }
 
-void Cube::setupVAO(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float scale) {
+void Cube::setupVAO(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float scale, int N) {
   // Release previous VAO
   abcg::glDeleteVertexArrays(1, &m_VAO);
 
@@ -131,6 +131,7 @@ void Cube::setupVAO(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float 
   m_modelMatrixLoc = modelMatrixLoc;
   m_colorLoc = colorLoc;
   m_scale = scale;
+  m_maxPos = m_scale * N;
 }
 
 void Cube::update(float deltaTime) {
