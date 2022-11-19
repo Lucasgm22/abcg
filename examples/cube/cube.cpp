@@ -183,25 +183,25 @@ void Cube::translate() {
 }
 
 void Cube::moveDown() {
-  if (m_position.z + m_scale > m_maxPos || m_isMoving) return;
+  if (m_isMoving || m_position.z + m_scale > m_maxPos) return;
   m_isMoving = true;
   m_orientation = Orientation::DOWN;
 }
 
 void Cube::moveUp() {
-  if (m_position.z - m_scale < -m_maxPos || m_isMoving) return;
+  if (m_isMoving || m_position.z - m_scale < -m_maxPos) return;
   m_isMoving = true;
   m_orientation = Orientation::UP;
 }
 
 void Cube::moveLeft() {
-  if (m_position.x - m_scale < -m_maxPos || m_isMoving) return;
+  if (m_isMoving || m_position.x - m_scale < -m_maxPos) return;
   m_isMoving = true;
   m_orientation = Orientation::LEFT;
 }
 
 void Cube::moveRigth() {
-  if (m_position.x + m_scale > m_maxPos || m_isMoving) return; 
+  if (m_isMoving || m_position.x + m_scale > m_maxPos) return; 
   m_isMoving = true;
   m_orientation = Orientation::RIGHT;
 }
