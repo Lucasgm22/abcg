@@ -134,22 +134,7 @@ void Cube::setupVAO(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float 
 }
 
 void Cube::update(float deltaTime) {
-  if (m_isMoving) {
-    switch (m_orientation) {
-    case Orientation::DOWN:
-      moveDown(deltaTime);
-      break;
-    case Orientation::UP:
-      moveUp(deltaTime);
-      break;
-    case Orientation::LEFT:
-      moveLeft(deltaTime);
-      break;
-    case Orientation::RIGHT:
-      moveRigth(deltaTime);
-      break;
-    }
-  }
+  move(deltaTime);
 }
 
 
@@ -161,6 +146,7 @@ void Cube::destroy() const {
 
 
 void Cube::move(float deltaTime) {
+  if (!m_isMoving) return;
   if (m_angle >= 0.0f && m_angle <= 90.0f) {
     increaseAngle(deltaTime * m_angleVelocity);
     m_animationMatrix = glm::rotate(glm::mat4{1.0f}, glm::radians(gsl::narrow_cast<int>(m_orientation) * 90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //ROTATE AROUND A DIRECTION
@@ -170,7 +156,6 @@ void Cube::move(float deltaTime) {
   } else if (m_angle >= 90.0f) {
     resetAnimation(); 
     translate();
-    m_isMoving = false;
   }
 }
 
@@ -197,38 +182,30 @@ void Cube::translate() {
   }
 }
 
-void Cube::moveDown(float deltaTime) {
-  if (m_position.z + m_scale > m_maxPos) return;
+void Cube::moveDown() {
+  if (m_position.z + m_scale > m_maxPos || m_isMoving) return;
   m_isMoving = true;
   m_orientation = Orientation::DOWN;
-  move(deltaTime);
 }
 
-void Cube::moveUp(float deltaTime) {
-  if (m_position.z - m_scale < -m_maxPos) return;
+void Cube::moveUp() {
+  if (m_position.z - m_scale < -m_maxPos || m_isMoving) return;
   m_isMoving = true;
   m_orientation = Orientation::UP;
-  move(deltaTime);
 }
 
-void Cube::moveLeft(float deltaTime) {
-  if (m_position.x - m_scale < -m_maxPos) return;
+void Cube::moveLeft() {
+  if (m_position.x - m_scale < -m_maxPos || m_isMoving) return;
   m_isMoving = true;
   m_orientation = Orientation::LEFT;
-  move(deltaTime);
 }
 
-void Cube::moveRigth(float deltaTime) {
-  if (m_position.x + m_scale > m_maxPos) return; 
+void Cube::moveRigth() {
+  if (m_position.x + m_scale > m_maxPos || m_isMoving) return; 
   m_isMoving = true;
   m_orientation = Orientation::RIGHT;
-  move(deltaTime);
 }
 
 void Cube::increaseAngle(float inc) {
   m_angle += inc;
-}
-
-bool Cube::isMoving() {
-  return m_isMoving;
 }

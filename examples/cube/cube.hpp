@@ -16,11 +16,10 @@ public:
   void update(float deltaTime);
   void setupVAO(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float scale);
   void destroy() const;
-  void moveLeft(float deltaTime);
-  void moveRigth(float deltaTime);
-  void moveUp(float deltaTime);
-  void moveDown(float deltaTime);
-  bool isMoving();
+  void moveLeft();
+  void moveRigth();
+  void moveUp();
+  void moveDown();
 
 private:
   GLuint m_VAO{};
