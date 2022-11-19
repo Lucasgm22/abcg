@@ -14,7 +14,7 @@ public:
   void loadObj(std::string_view path);
   void paint();
   void update(float deltaTime);
-  void setupVAO(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float scale, int N);
+  void create(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float scale, int N);
   void destroy() const;
   void moveLeft();
   void moveRigth();

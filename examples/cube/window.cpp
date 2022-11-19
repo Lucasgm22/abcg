@@ -38,7 +38,7 @@ void Window::onCreate() {
 
   m_ground.create(m_program, m_modelMatrixLoc, m_colorLoc, m_scale, m_N);
   m_cube.loadObj(assetsPath + "box.obj");
-  m_cube.setupVAO(m_program, m_modelMatrixLoc, m_colorLoc, m_scale, m_N);
+  m_cube.create(m_program, m_modelMatrixLoc, m_colorLoc, m_scale, m_N);
 
   m_viewMatrix =glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
                             glm::vec3(0.0f, 0.0f, 0.0f), 
