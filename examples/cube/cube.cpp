@@ -147,13 +147,13 @@ void Cube::destroy() const {
 
 void Cube::move(float deltaTime) {
   if (!m_isMoving) return;
-  if (m_angle >= 0.0f && m_angle < 90.0f) {
+  if (m_angle >= 0.0f && m_angle < 90.0f) { //Angle in [0, 90) continue moving
     increaseAngle(deltaTime * m_angleVelocity);
     m_animationMatrix = glm::rotate(glm::mat4{1.0f}, glm::radians(gsl::narrow_cast<int>(m_orientation) * 90.0f), glm::vec3(0.0f, 1.0f, 0.0f)); //ROTATE AROUND A DIRECTION
     m_animationMatrix = glm::translate(m_animationMatrix, glm::vec3(0, -m_scale/2, m_scale/2)); //PUT ON ORIGIN
     m_animationMatrix = glm::rotate(m_animationMatrix, glm::radians(m_angle), glm::vec3(1.0f, 0.0f, 0.0f)); //ROTATE AROUND X axis
     m_animationMatrix = glm::translate(m_animationMatrix, glm::vec3(0, m_scale/2, -m_scale/2));//TRANSLATTE TO MATCH X axis
-  } else if (m_angle >= 90.0f) {
+  } else if (m_angle >= 90.0f) { //Angle in [90, +infinity) finish moviment
     resetAnimation(); 
     translate();
   }
