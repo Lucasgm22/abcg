@@ -46,7 +46,7 @@ private:
   Orientation m_orientation{Orientation::DOWN};
   bool m_isMoving{false};
   float m_maxPos{1.0f};
-  float m_angleVelocity{360.0f};
+  float m_angleVelocity{360.0f}; //animation to move takes 1/4 of a second
 
   void move(float deltaTime);
   void translate();
