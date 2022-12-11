@@ -4,13 +4,17 @@ precision mediump float;
 
 uniform vec4 color;
 uniform mat4 viewMatrix;
+
+//Light Properties
 uniform vec3 lightPosition;
-uniform float Ka;
-uniform float Kd;
-uniform float Ks;
 uniform float Ia;
 uniform float Id;
 uniform float Is;
+//Material properties
+uniform float Ka;
+uniform float Kd;
+uniform float Ks;
+
 uniform samplerCube cubeTex;
 
 
@@ -18,10 +22,8 @@ uniform samplerCube cubeTex;
 in vec3 fragN;
 in vec3 fragV;
 
-// Light properties
 
 
-// Material properties
 
 
 out vec4 outColor;

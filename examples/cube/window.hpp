@@ -57,7 +57,6 @@ private:
   GLint m_projMatrixLoc{};
 
   //Light Properties
-  GLint m_lightPosLoc{};
   glm::vec3 m_lightPos{0.0f, 1.0f, 0.0f};
   
   GLint m_IaLoc{};
