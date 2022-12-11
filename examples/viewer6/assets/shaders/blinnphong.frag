@@ -2,34 +2,22 @@
 
 precision mediump float;
 
-uniform vec4 color;
-uniform mat4 viewMatrix;
-uniform vec3 lightPosition;
-uniform float Ka;
-uniform float Kd;
-uniform float Ks;
-uniform float Ia;
-uniform float Id;
-uniform float Is;
-uniform samplerCube cubeTex;
-
-
-
 in vec3 fragN;
+in vec3 fragL;
 in vec3 fragV;
 
 // Light properties
-
+uniform vec4 Ia, Id, Is;
 
 // Material properties
-
+uniform vec4 Ka, Kd, Ks;
+uniform float shininess;
 
 out vec4 outColor;
 
-vec4 BlinnPhong(vec3 N, vec3 V) {
+vec4 BlinnPhong(vec3 N, vec3 L, vec3 V) {
   N = normalize(N);
-  
-  vec3 L = normalize((viewMatrix * vec4(lightPosition, 1.0)).xyz + V);
+  L = normalize(L);
 
   // Compute lambertian term
   float lambertian = max(dot(N, L), 0.0);
@@ -40,19 +28,21 @@ vec4 BlinnPhong(vec3 N, vec3 V) {
     V = normalize(V);
     vec3 H = normalize(L + V);
     float angle = max(dot(H, N), 0.0);
-    specular = pow(angle, 25.0);
+    specular = pow(angle, shininess);
   }
 
-  vec4 diffuseColor = vec4(Ka * Ia * lambertian);
-  vec4 specularColor = vec4(Kd * Id * specular);
-  vec4 ambientColor = vec4(Ks * Is); 
+  vec4 diffuseColor = Kd * Id * lambertian;
+  vec4 specularColor = Ks * Is * specular;
+  vec4 ambientColor = Ka * Ia;
 
   return ambientColor + diffuseColor + specularColor;
 }
 
 void main() {
+  vec4 color = BlinnPhong(fragN, fragL, fragV);
+
   if (gl_FrontFacing) {
-    outColor = color * BlinnPhong(fragN, fragV);
+    outColor = color;
   } else {
     float i = (color.r + color.g + color.b) / 3.0;
     outColor = vec4(i, 0, 0, 1.0);

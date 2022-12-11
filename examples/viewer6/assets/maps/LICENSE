@@ -1,0 +1,14 @@
+Files: bunny.obj
+Name: Stanford Bunny
+Author: Stanford University Computer Graphics Laboratory
+License: Stanford Scan (http://www.graphics.stanford.edu/data/3Dscanrep/)
+
+Files: roman_lamp*, maps/roman_lamp*
+Name: Lamp, Roman
+Author: The British Museum (https://sketchfab.com/britishmuseum)
+License: CC BY-NC-SA 4.0 (https://creativecommons.org/licenses/by-nc-sa/4.0/)
+
+Files: teapot.obj
+Name: Utah Teapot
+Author: Martin Newell
+License: CC0 (https://creativecommons.org/share-your-work/public-domain/cc0/)

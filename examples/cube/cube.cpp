@@ -7,7 +7,8 @@
 template <> struct std::hash<Vertex> {
   size_t operator()(Vertex const &vertex) const noexcept {
     auto const h1{std::hash<glm::vec3>()(vertex.position)};
-    return h1;
+    auto const h2{std::hash<glm::vec3>()(vertex.normal)};
+    return abcg::hashCombine(h1, h2);
   }
 };
 
@@ -54,6 +55,8 @@ void Cube::loadObj(std::string_view path) {
   m_vertices.clear();
   m_indices.clear();
 
+  m_hasNormals = false;
+
   // A key:value map with key=Vertex and value=index
   std::unordered_map<Vertex, GLuint> hash{};
 
@@ -66,11 +69,21 @@ void Cube::loadObj(std::string_view path) {
 
       // Vertex position
       auto const startIndex{3 * index.vertex_index};
-      auto const vx{attrib.vertices.at(startIndex + 0)};
-      auto const vy{attrib.vertices.at(startIndex + 1)};
-      auto const vz{attrib.vertices.at(startIndex + 2)};
+      glm::vec3 position{attrib.vertices.at(startIndex + 0),
+                         attrib.vertices.at(startIndex + 1),
+                         attrib.vertices.at(startIndex + 2)};
 
-      Vertex const vertex{.position = {vx, vy, vz}};
+      // Vertex normal
+      glm::vec3 normal{};
+      if (index.normal_index >= 0) {
+        m_hasNormals = true;
+        auto const normalStartIndex{3 * index.normal_index};
+        normal = {attrib.normals.at(normalStartIndex + 0),
+                  attrib.normals.at(normalStartIndex + 1),
+                  attrib.normals.at(normalStartIndex + 2)};
+      }
+
+      Vertex const vertex{.position = position, .normal = normal};
 
       // If hash doesn't contain this vertex
       if (!hash.contains(vertex)) {
@@ -84,16 +97,61 @@ void Cube::loadObj(std::string_view path) {
     }
   }
 
+  if (!m_hasNormals) {
+    computeNormals();
+  }
+
   createBuffers();
 }
 
+void Cube::computeNormals() {
+  // Clear previous vertex normals
+  for (auto &vertex : m_vertices) {
+    vertex.normal = glm::vec3(0.0f);
+  }
+
+  // Compute face normals
+  for (auto const offset : iter::range(0UL, m_indices.size(), 3UL)) {
+    // Get face vertices
+    auto &a{m_vertices.at(m_indices.at(offset + 0))};
+    auto &b{m_vertices.at(m_indices.at(offset + 1))};
+    auto &c{m_vertices.at(m_indices.at(offset + 2))};
+
+    // Compute normal
+    auto const edge1{b.position - a.position};
+    auto const edge2{c.position - b.position};
+    auto const normal{glm::cross(edge1, edge2)};
+
+    // Accumulate on vertices
+    a.normal += normal;
+    b.normal += normal;
+    c.normal += normal;
+  }
+
+  // Normalize
+  for (auto &vertex : m_vertices) {
+    vertex.normal = glm::normalize(vertex.normal);
+  }
+
+  m_hasNormals = true;
+}
+
 void Cube::paint() {
+
   // Set uniform variables for the cube
   m_positionMatrix = glm::translate(glm::mat4{1.0f}, m_position);
   m_modelMatrix = m_positionMatrix * m_animationMatrix;
   m_modelMatrix = glm::scale(m_modelMatrix, glm::vec3(m_scale, m_scale, m_scale));
   abcg::glUniformMatrix4fv(m_modelMatrixLoc, 1, GL_FALSE, &m_modelMatrix[0][0]);
   abcg::glUniform4f(m_colorLoc, 1.0f, 0.0f, 0.0f, 1.0f); // RED
+
+  abcg::glUniform1f(m_KaLoc, m_Ka); 
+  abcg::glUniform1f(m_KdLoc, m_Kd);
+  abcg::glUniform1f(m_KsLoc, m_Ks);  
+
+  auto const modelViewMatrix{glm::mat3(m_viewMatrix * m_modelMatrix)};
+  auto const normalMatrix{glm::inverseTranspose(modelViewMatrix)};
+  abcg::glUniformMatrix3fv(m_normalMatrixLoc, 1, GL_FALSE, &normalMatrix[0][0]);
 
   //SET uniform variables here
   abcg::glBindVertexArray(m_VAO);
@@ -103,7 +161,7 @@ void Cube::paint() {
   abcg::glBindVertexArray(0);
 }
 
-void Cube::create(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float scale, int N) {
+void Cube::create(GLuint program, GLint modelMatrixLoc, GLint colorLoc, GLint normalMatrixLoc, glm::mat4 viewMatrix, float scale, int N) {
   // Release previous VAO
   abcg::glDeleteVertexArrays(1, &m_VAO);
 
@@ -124,11 +182,27 @@ void Cube::create(GLuint program, GLint modelMatrixLoc, GLint colorLoc, float sc
                                 sizeof(Vertex), nullptr);
   }
 
+  auto const normalAttribute{abcg::glGetAttribLocation(program, "inNormal")};
+  if (normalAttribute >= 0) {
+    abcg::glEnableVertexAttribArray(normalAttribute);
+    auto const offset{offsetof(Vertex, normal)};
+    abcg::glVertexAttribPointer(normalAttribute, 3, GL_FLOAT, GL_FALSE,
+                                sizeof(Vertex),
+                                reinterpret_cast<void *>(offset));
+  }
+
   // End of binding
   abcg::glBindBuffer(GL_ARRAY_BUFFER, 0);
   abcg::glBindVertexArray(0);
 
+  m_KaLoc = abcg::glGetUniformLocation(program, "Ka");
+  m_KdLoc = abcg::glGetUniformLocation(program, "Kd");
+  m_KsLoc = abcg::glGetUniformLocation(program, "Ks");
+
+
   m_modelMatrixLoc = modelMatrixLoc;
+  m_normalMatrixLoc = normalMatrixLoc;
+  m_viewMatrix = viewMatrix;
   m_colorLoc = colorLoc;
   m_scale = scale;
   m_maxPos = m_scale * N;

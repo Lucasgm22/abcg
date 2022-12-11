@@ -1,6 +1,8 @@
 Lucas Guimarães Miranda - RA:11070916
 # [Cube](https://lucasgm22.github.io/cg/cube/)
 
+//TODO: UPDATE README
+
 ## O que é?
 Cube se trata de uma aplicação onde se controla um cubo que pode se mover em um tabuleiro, é insperada na movimentação do jogo [Bloxers](https://www.addictinggames.com/puzzle/bloxorz), o objetivo da aplicação é explorar a matriz de modelo para criar animações.
 
